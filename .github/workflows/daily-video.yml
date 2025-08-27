@@ -1,32 +1,28 @@
 name: Daily YouTube Bot
 
 on:
-  workflow_dispatch:  # Manual trigger
   schedule:
-    - cron: "0 12 * * *"  # Runs every day at 12:00 UTC
+    - cron: '0 12 * * *'   # Runs every day at 12:00 UTC
+  workflow_dispatch:        # Lets you run manually from GitHub Actions
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install moviepy
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install moviepy[optional]
+        pip install imageio[ffmpeg]
 
-      - name: Install ImageMagick
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
-
-      - name: Run script
-        run: python Generate_daily_video.py
+    - name: Run script
+      run: python Generate_daily_video.py
