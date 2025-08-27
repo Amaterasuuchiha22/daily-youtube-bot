@@ -20,10 +20,14 @@ jobs:
 
     - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick   # ✅ install ImageMagick for TextClip
         python -m pip install --upgrade pip
         pip install "moviepy==1.0.3"
         pip install imageio[ffmpeg] requests numpy pillow
 
     - name: Run script
+      env:
+        IMAGEMAGICK_BINARY: /usr/bin/convert   # ✅ tell MoviePy where ImageMagick is
       run: |
         python Generate_daily_video.py
