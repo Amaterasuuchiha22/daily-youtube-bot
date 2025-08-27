@@ -1,43 +1,32 @@
 name: Daily YouTube Bot
 
 on:
-  workflow_dispatch:        # run manually
+  workflow_dispatch:  # Manual trigger
   schedule:
-    - cron: "30 4 * * *"    # daily 10:00 AM India (04:30 UTC)
+    - cron: "0 12 * * *"  # Runs every day at 12:00 UTC
 
 jobs:
-  run-bot:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install system deps (ffmpeg, ImageMagick, fonts)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick fonts-dejavu-core
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install Python deps
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install moviepy
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
       - name: Run script
-        env:
-          YT_CLIENT_ID:     ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
-        run: |
-          python Generate_daily_video.py
-
-      - name: Upload video as artifact (for download)
-        uses: actions/upload-artifact@v4
-        with:
-          name: daily-video
-          path: out/video.mp4
+        run: python Generate_daily_video.py
