@@ -1,33 +1,33 @@
-name: build
+name: Daily Anime Video Upload
 
 on:
+  workflow_dispatch:  # lets you run manually
   schedule:
-    - cron: "0 0 * * *"   # runs every day at midnight UTC
-  workflow_dispatch:       # allows manual run
+    - cron: "0 12 * * *"   # runs daily at 12:00 UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y imagemagick   # ✅ install ImageMagick for TextClip
         python -m pip install --upgrade pip
-        pip install "moviepy==1.0.3"
-        pip install imageio[ffmpeg] requests numpy pillow
+        pip install moviepy
 
-    - name: Run script
-      env:
-        IMAGEMAGICK_BINARY: /usr/bin/convert   # ✅ tell MoviePy where ImageMagick is
-      run: |
-        python Generate_daily_video.py
+    - name: Generate video
+      run: python Generate_daily_video.py
+
+    - name: Upload video artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-video
+        path: output.mp4
